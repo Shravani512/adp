@@ -1,0 +1,104 @@
+package com.example.new_9;
+
+
+
+import android.os.Bundle;
+import android.os.Environment;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class MainActivity extends AppCompatActivity {
+    private static final String FILE_NAME = "example.txt";
+    EditText mEditText;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        mEditText = findViewById(R.id.edit_text);
+    }
+
+    public void Save(View view) {
+        String text = mEditText.getText().toString();
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
+        FileOutputStream fos = null;
+
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(text.getBytes());
+            mEditText.getText().clear();
+            Toast.makeText(this, "Saved to " + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error saving file", Toast.LENGTH_SHORT).show();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void Load(View view) {
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), FILE_NAME);
+
+        if (file.exists()) {
+            FileInputStream fis = null;
+
+            try {
+                fis = new FileInputStream(file);
+                InputStreamReader isr = new InputStreamReader(fis);
+                BufferedReader br = new BufferedReader(isr);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+                mEditText.setText(sb.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error loading file", Toast.LENGTH_SHORT).show();
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(this, "File not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
